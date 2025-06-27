@@ -3,7 +3,6 @@ function async()
     vim.cmd [[packadd! asyncrun.vim]]
     vim.cmd [[packadd! asynctasks.vim]]
     vim.cmd [[
-
         "设置vim-terminal-help
         let g:terminal_kill = "term"
         let g:terminal_list = 0
@@ -11,7 +10,7 @@ function async()
         let g:terminal_cwd = 2
         let g:terminal_height = 24
         let g:terminal_fixheight = 1
-        let  g:terminal_pos="tab"
+        let g:terminal_pos="tab"
         if has('nvim')
             function! TerminalQuit()
                 let bid = get(t:, '__terminal_bid__', -1)
@@ -36,25 +35,32 @@ function async()
         "nnoremap <leader>rs :AsyncStop<cr>
         "nnoremap <leader>rg :AsyncRun -mode=tab -focus=1 -pos=tab gdb<cr>
         "设置asynctasks
+        let buildcmd=expand('~/develop/c.tools/gotobuild.sh')
         let g:asynctasks_term_reuse = 1
         let g:asynctasks_term_focus = 1
-        let g:asynctasks_term_pos = 'tab'
         let g:asynctasks_term_rows = 10    " set height for the horizontal terminal split
         let g:asynctasks_term_cols = 80    " set width for vertical terminal split
-        nnoremap <leader>rb :AsyncTaskProfile debug release<cr> :AsyncTask build<cr>
-        nnoremap <leader>rc :AsyncTaskProfile debug release<cr> :AsyncTask scp<cr>
-        "nnoremap <leader>rr :AsyncTask run<cr>
-        let g:asynctasks_term_focus= 0
+        nnoremap <leader>rb :AsyncTaskProfile<cr> :AsyncTask build<cr>
 
     ]]
 end
 async()
 
-function _G.MyTaskFinish(command, mode)
-    if vim.g.asyncrun_code == 0
+function _G.MyTaskFinish(command)
+    if (math.abs(vim.g.asyncrun_code) < 10e-6)
     then
-        require("notify")(command .. " " .. vim.g.task_for_notify .. " with mode " .. mode .. "\ntask success!\n", "info")
+        require("notify")(command .. " " .. "Spdk" .. "\ntask success!\n", "info")
     else
-        require("notify")(command .. " " .. vim.g.task_for_notify .. " with mode " .. mode .. "\ntask failed!\n" , "error")
+        require("notify")(command .. " " .. "Spdk" .. "\ntask failed!\n" , "error")
+
     end
 end
+
+--function _G.MyTaskFinish(command, mode)
+    --if vim.g.asyncrun_code == 0
+    --then
+        --require("notify")(command .. " " .. vim.g.task_for_notify .. " with mode " .. mode .. "\ntask success!\n", "info")
+    --else
+        --require("notify")(command .. " " .. vim.g.task_for_notify .. " with mode " .. mode .. "\ntask failed!\n" , "error")
+    --end
+--end

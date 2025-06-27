@@ -2,7 +2,7 @@ function signature()
     vim.cmd [[packadd! vim-signature]]
     vim.cmd[[
         "设置signature
-        let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        let g:SignatureIncludeMarks = 'bcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXYZ'
     ]]
 end
 signature()

@@ -42,12 +42,12 @@ function dashboard()
         nnoremap <silent> <Leader>db :<c-u>Dashboard<cr>
         nnoremap <silent> <Leader>ds :<c-u>SessionSave<cr>
         nnoremap <silent> <Leader>dl :<c-u>SessionLoad<cr>
-        nnoremap <silent> <Leader>dh :DashboardFindHistory<cr>
-        nnoremap <silent> <Leader>df :DashboardFindFile<cr>
-        nnoremap <silent> <Leader>dc :DashboardChangeColorscheme<cr>
-        nnoremap <silent> <Leader>dt :DashboardFindWord<cr>
-        nnoremap <silent> <Leader>dr :DashboardJumpMark<cr>
-        nnoremap <silent> <Leader>dn :DashboardNewFile<cr>
+        nnoremap <silent> <Leader>dh :<c-u>DashboardFindHistory<cr>
+        nnoremap <silent> <Leader>df :<c-u>DashboardFindFile<cr>
+        nnoremap <silent> <Leader>dc :<c-u>DashboardChangeColorscheme<cr>
+        nnoremap <silent> <Leader>dt :<c-u>DashboardFindWord<cr>
+        nnoremap <silent> <Leader>dr :<c-u>DashboardJumpMark<cr>
+        nnoremap <silent> <Leader>dn :<c-u>DashboardNewFile<cr>
 
     ]]
 end

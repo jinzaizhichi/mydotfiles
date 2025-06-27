@@ -1,0 +1,6 @@
+[build]
+cwd=<root>
+command:c,cpp=sh /Users/shiyaoliang/develop/c.tools/gotobuild.sh
+output=terminal
+silent=1
+notify=:lua MyTaskFinish('build', 'release')

@@ -28,7 +28,7 @@ cmd([[
 cmd([[
     nmap <silent> <c-s> <Plug>(coc-references)
     nmap <silent> <c-]> <Plug>(coc-definition)
-    nmap <silent> <c-y> <Plug>(coc-implementation)
+    nmap <silent> <c-\> <Plug>(coc-implementation)
     nnoremap <silent> <leader>qd <Cmd>lua _G.diagnostic()<CR>
 ]])
 
