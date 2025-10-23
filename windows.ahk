@@ -5,11 +5,12 @@ SendMode Input
 
 String1 := "string1"
 String2 := "string2"
+String3 := "string3"
 
 ; 设置热键 Ctrl + / 来显示选择菜单
 ^8::
     ; 创建 GUI
-    Gui, Add, Text, , 根据编号输入字符串：`n1: 我的密码`n2: 公司密码
+    Gui, Add, Text, , 根据编号输入字符串：`n1: 我的密码`n2: 公司密码`n3: nas密码
     Gui, Add, Edit, vOutputVar w200, 1  ; 默认值为1, 宽度200
     Gui, Add, Button, Default, 确定
     Gui, Show, , 选择选项
@@ -27,7 +28,10 @@ Button确定:
         StringToSend := Trim(String1)  ; 确保去掉前后空格
     } else if (OutputVar = "2") {
         StringToSend := Trim(String2)  ; 确保去掉前后空格
+    } else if (OutputVar = "3") {
+        StringToSend := Trim(String3)  ; 确保去掉前后空格
     }
+
 
     Gui, Destroy  ; 关闭 GUI 窗口
     Sleep, 100  ; 等待剪贴板更新
@@ -38,6 +42,132 @@ Button确定:
     ; 模拟粘贴
     Send, ^v  ; Ctrl + V 来粘贴剪贴板的内容
 return
+
+; 在网易 Popo 中将 Ctrl + j 和 Ctrl + k 映射为 Ctrl + 下箭头和 Ctrl + 上箭头
+#If WinActive("网易POPO")  ; 仅在网易 Popo 窗口激活时生效
+    Tab::
+        ; 检查当前窗口是否为活动状态
+        if WinActive("ahk_class Qt643QWindowIcon")
+        {
+            ; 获取当前焦点控件
+            ControlGetFocus, focusedControl, ahk_class Qt643QWindowIcon
+            ; 如果没有控件有焦点，则执行点击
+            if (focusedControl = "")
+            {
+                ; 获取窗口的位置和大小
+                WinGetPos, winX, winY, winWidth, winHeight, ahk_class Qt643QWindowIcon
+                ; 计算目标点击点的坐标
+                targetX := winX + (winWidth * 2/3)  ; 从左往右的1/2
+                targetY := winY + (winHeight * 9/10)  ; 从上往下的19/20
+                ; 执行点击
+                Click, %targetX%, %targetY%
+            }
+        }
+        return
+    f15 & n::  ; F15 + n
+            Send, ^{Down}  ; 发送 Ctrl + 下箭头
+        return
+    f15 & p::  ; F15 + p
+            Send, ^{Up}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & m::  ; Ctrl + k
+        Send, {Backspace}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & h::  ; Ctrl + k
+        Send, {Left}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & j::  ; Ctrl + k
+        Send, {Down}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & k::  ; Ctrl + k
+        Send, {Up}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & l::  ; Ctrl + k
+        Send, {Right}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & a::  ; Ctrl + k
+        Send, {Home}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & e::  ; Ctrl + k
+        Send, {End}  ; 发送 Ctrl + 上箭头
+        return
+    f15 & [::  ; 使用 F15 + [ 键来触发点击
+        ; 获取窗口的位置和大小
+        WinGetPos, winX, winY, winWidth, winHeight, ahk_class Qt643QWindowIcon
+        ; 计算目标点击点的坐标
+        targetX := winX + (winWidth * 1/8)  ; 从左往右的1/8
+        targetY := winY + (winHeight * 99/100)  ; 从上往下的1/5
+        ; 执行点击
+        Click, %targetX%, %targetY%
+        return
+    ^k::  ; Ctrl + k
+        Send, ^f  ; 发送 Ctrl + f
+#If  ; 结束条件块
+
+A_PreviouslyPressed := false  ; 重置标记
+#IfWinActive ahk_class Chrome_WidgetWin_1  ; 确保只在 Chrome 中有效
+; Ctrl + K -> Ctrl + T
+^k::
+    if !A_PreviouslyPressed
+    {
+        A_PreviouslyPressed := true
+        Send, ^t
+        SetTimer, ResetPressed, -500
+    }
+return
+; 左箭头
+F15 & h::
+   Send, {Left}
+return
+; 右箭头
+F15 & l::
+   Send, {Right}
+return
+; 下箭头
+F15 & j::
+   Send, {Down}
+return
+; 上箭头
+F15 & k::
+   Send, {Up}
+return
+; 删除
+F15 & m::
+    Send, {Backspace}
+return
+F15 & a::
+    Send, {Home}
+return
+F15 & e::
+    Send, {End}
+return
+F15 & [::
+    Send, {Esc}
+return
+Ctrl & n::return
+Ctrl & p::return
+; F15 + N -> Ctrl + Tab
+F15 & n::
+    if !A_PreviouslyPressed
+    {
+        Send, ^{Tab}
+        A_PreviouslyPressed := true
+        SetTimer, ResetPressed, -500
+    }
+return
+; F15 + P -> Ctrl + Shift + Tab
+F15 & p::
+    if !A_PreviouslyPressed
+    {
+        Send, ^+{Tab}
+        A_PreviouslyPressed := true
+        SetTimer, ResetPressed, -500
+    }
+return
+ResetPressed:
+    A_PreviouslyPressed := false  ; 重置标记
+return
+#IfWinActive  ; 结束条件
 
 ; 处理 ESC 键的事件
 GuiEscape:
@@ -63,17 +193,38 @@ return
     }
 return
 
+; 按下 Ctrl + Shift + S 关机（可修改按键）
+^+s::
+    Run, shutdown /s /t 0
+return
+
+; 按下 Ctrl + Shift + R 重启
+^+r::
+    Run, shutdown /r /t 0
+return
+
 ; capslock
 F15Pressed := false  ; 标记 F15 是否被按下
+F15DownTime := 0
+isFirst := 1
 
 ; F15 按下时的处理
 F15::
     F15Pressed := true  ; 设置为按下状态
-    return
+    if(isFirst == 1) {
+        F15DownTime := A_TickCount
+        isFirst := 0
+    }
+return
 
 ; F15 释放时的处理
 F15 Up::
     F15Pressed := false  ; 重置为未按下状态
+    duration := A_TickCount - F15DownTime
+    if (duration <= 200 && A_PriorKey == "F15") {
+        Send, {LWin Down}{LControl Down}{LAlt Down}{Tab}{LAlt Up}{LControl Up}{LWin Up}
+    }
+    isFirst := 1
     return
 
 ; 处理 F15 与其他键的组合
@@ -87,19 +238,19 @@ F15 Up::
     ; M/A/E 与 F15 组合
     m::Send, {Backspace}  ; Ctrl + M
     a::Send, {Home}    ; Ctrl + A
-    b::Send, ^u  ; Ctrl + U
     e::Send, {End}     ; Ctrl + E
 
     ; F15 + [ 等于 Esc
     [::Send, {Esc} ; 发送 Ctrl + [
- 
+
     ; 字母键
+    b::Send, ^b  ; Ctrl + U
     c::Send, ^c  ; Ctrl + C
     d::Send, ^d  ; Ctrl + D
     f::Send, ^f  ; Ctrl + F
     g::Send, ^g  ; Ctrl + G
     i::Send, ^i  ; Ctrl + I
-    n::Send, ^b  ; Ctrl+l
+    n::Send, ^y  ; Ctrl+l
     o::Send, ^o  ; Ctrl + O
     p::Send, ^h  ; Ctrl+H
     q::Send, ^q  ; Ctrl + Q
@@ -217,13 +368,13 @@ currentMonitor := 1
 ^+p::  ; Ctrl + Shift + P
     ; 获取连接的监视器数量
     SysGet, MonitorCount, MonitorCount
-    
+
     ; 获取当前活动窗口
     WinGet, activeWin, ID, A
     WinGetClass, winClass, ahk_id %activeWin%
     WinGet, winProcess, ProcessName, ahk_id %activeWin%
     WinGet, winMax, MinMax, ahk_id %activeWin%
-    
+
     ; 检查窗口是否最大化
     isMaximized := (winMax = 1)
 
@@ -236,10 +387,10 @@ currentMonitor := 1
         WinRestore, ahk_id %activeWin%
         Sleep, 100 ; 增加延迟确保窗口已恢复
     }
-    
+
     ; 获取当前窗口位置和大小
     WinGetPos, X, Y, Width, Height, ahk_id %activeWin%
-    
+
     ; 确定窗口当前所在的显示器
     windowOnMonitor := 1  ; 默认设为1
     Loop, %MonitorCount%
@@ -251,28 +402,28 @@ currentMonitor := 1
             break
         }
     }
-    
+
     ; 计算下一个显示器的编号
     currentMonitor := (windowOnMonitor >= MonitorCount) ? 1 : windowOnMonitor + 1
-    
+
     ; 获取下一个显示器的位置和尺寸
     SysGet, MonitorRect, Monitor, %currentMonitor%
     TargetX := MonitorRectLeft
     TargetY := MonitorRectTop
     MonitorWidth := MonitorRectRight - MonitorRectLeft
     MonitorHeight := MonitorRectBottom - MonitorRectTop
- 
+
     if (isMaximized)
     {
-        newWidth := MonitorWidth * 1.0
-        newHeight := MonitorHeight * 1.0
+        newWidth := MonitorWidth * 1.0  ; 80%宽度（避免渲染错误）
+        newHeight := MonitorHeight * 1.0 ; 80%高度
         WinMove, ahk_id %activeWin%,, TargetX, TargetY, newWidth, newHeight
         if(!isPOPO)  {
             WinMaximize, ahk_id %activeWin%
         }
     }
     else
-    {   
+    {
         if(isPOPO) {
           newWidth := MonitorWidth * 1.0  ; 80%宽度（避免渲染错误）
           newHeight := MonitorHeight * 1.0 ; 80%高度
@@ -282,166 +433,16 @@ currentMonitor := 1
           WinMove, ahk_id %activeWin%,, TargetX, TargetY, Width, Height
         }
     }
-    
+
     ; 激活窗口（确保窗口保持激活状态）
     WinActivate, ahk_id %activeWin%
 return
-
-; 在网易 Popo 中将 Ctrl + j 和 Ctrl + k 映射为 Ctrl + 下箭头和 Ctrl + 上箭头
-#If WinActive("网易POPO")  ; 仅在网易 Popo 窗口激活时生效
-    Tab::
-        ; 检查当前窗口是否为活动状态
-        if WinActive("ahk_class Qt643QWindowIcon")
-        {
-            ; 获取当前焦点控件
-            ControlGetFocus, focusedControl, ahk_class Qt643QWindowIcon
-
-            ; 如果没有控件有焦点，则执行点击
-            if (focusedControl = "")
-            {
-
-                ; 获取窗口的位置和大小
-                WinGetPos, winX, winY, winWidth, winHeight, ahk_class Qt643QWindowIcon
-            
-                ; 计算目标点击点的坐标
-                targetX := winX + (winWidth * 2/3)  ; 从左往右的1/2
-                targetY := winY + (winHeight * 9/10)  ; 从上往下的19/20
-            
-                ; 执行点击
-                Click, %targetX%, %targetY%
-            }
-        }
-        return
-
-    f15 & n::  ; F15 + n
-            Send, ^{Down}  ; 发送 Ctrl + 下箭头
-        return
-
-    f15 & p::  ; F15 + p
-            Send, ^{Up}  ; 发送 Ctrl + 上箭头
-        return
-
-    f15 & m::  ; Ctrl + k
-        Send, {Backspace}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & h::  ; Ctrl + k
-        Send, {Left}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & j::  ; Ctrl + k
-        Send, {Down}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & k::  ; Ctrl + k
-        Send, {Up}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & l::  ; Ctrl + k
-        Send, {Right}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & a::  ; Ctrl + k
-        Send, {Home}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & e::  ; Ctrl + k
-        Send, {End}  ; 发送 Ctrl + 上箭头
-        return
-    f15 & [::  ; 使用 F15 + [ 键来触发点击
-        ; 获取窗口的位置和大小
-        WinGetPos, winX, winY, winWidth, winHeight, ahk_class Qt643QWindowIcon
-        
-        ; 计算目标点击点的坐标
-        targetX := winX + (winWidth * 1/8)  ; 从左往右的1/8
-        targetY := winY + (winHeight * 99/100)  ; 从上往下的1/5
-        
-        ; 执行点击
-        Click, %targetX%, %targetY%
-        return
-
-    ^k::  ; Ctrl + k
-        Send, ^f  ; 发送 Ctrl + f
-#If  ; 结束条件块
 
 #IfWinActive ahk_class Qt51514QWindowIcon
 ^k:: ; 当在微信窗口中按 Ctrl + K
     Send ^f ; 发送 Ctrl + F
 return
 #IfWinActive ; 结束上下文敏感热键
-
-A_PreviouslyPressed := false  ; 重置标记
-#IfWinActive ahk_class Chrome_WidgetWin_1  ; 确保只在 Chrome 中有效
-
-; Ctrl + K -> Ctrl + T
-^k::
-    if !A_PreviouslyPressed
-    {
-        A_PreviouslyPressed := true
-        Send, ^t
-        SetTimer, ResetPressed, -500
-    }
-return
-
-; 左箭头
-F15 & h::
-   Send, {Left}
-return
-
-; 右箭头
-F15 & l::
-   Send, {Right}
-return
-
-; 下箭头
-F15 & j::
-   Send, {Down}
-return
-
-; 上箭头
-F15 & k::
-   Send, {Up}
-return
-
-; 删除
-F15 & m::
-    Send, {Backspace}
-return
-
-F15 & a::
-    Send, {Home}
-return
-
-F15 & e::
-    Send, {End}
-return
-
-F15 & [::
-    Send, {Esc}
-return
-
-Ctrl & n::return
-Ctrl & p::return
-
-; F15 + N -> Ctrl + Tab
-F15 & n::
-    if !A_PreviouslyPressed
-    {
-        Send, ^{Tab}
-        A_PreviouslyPressed := true
-        SetTimer, ResetPressed, -500
-    }
-return
-
-; F15 + P -> Ctrl + Shift + Tab
-F15 & p::
-    if !A_PreviouslyPressed
-    {
-        Send, ^+{Tab}
-        A_PreviouslyPressed := true
-        SetTimer, ResetPressed, -500
-    }
-return
-
-ResetPressed:
-    A_PreviouslyPressed := false  ; 重置标记
-return
-
-#IfWinActive  ; 结束条件
 
 ^Delete:: ; Ctrl + Delete
     ; 弹出确认对话框
@@ -453,37 +454,17 @@ return
     }
 return
 
-; left ctrl
-; 定义全局变量
-ctrlIsDown := false
-ctrlDownTime := 0  ; 用于记录 Ctrl 键按下的时间
-
-; 处理 Left Ctrl 按下事件
-~LControl::    
-    if (!ctrlIsDown) {
-        ctrlIsDown := true
-        ctrlDownTime := A_TickCount  ; 记录按下的时间
-    }
+#If WinActive("ahk_exe Obsidian.exe")  ; 只在 Obsidian 中生效
+F15 & r::
+    Send, ^r
 return
-
-; 处理 Left Ctrl 释放事件
-~LControl Up::
-    ; 只有在没有其他键按下的情况下，才执行下面的逻辑
-    if (A_PriorKey == "LControl") {
-        duration := A_TickCount - ctrlDownTime  ; 计算按下持续时间
-        if (duration <= 1000) {  ; 如果持续时间小于或等于 1s
-            ; 发送组合键 LWin + LControl + LAlt + Tab
-            Send, {LWin Down}{LControl Down}{LAlt Down}{Tab}{LAlt Up}{LControl Up}{LWin Up}
-        }
-    }
-    ctrlIsDown := false  ; 重置状态
-return
+#If  ; 结束条件块
 
 ; 定义全局变量
 rctrlIsDown := false
 
 ; 处理Right Ctrl按下事件
-~RControl::    
+~RControl::
     if (!rctrlIsDown) {
         rctrlIsDown := true
     }
@@ -497,3 +478,4 @@ return
     }
     rctrlIsDown := false  ; 重置状态
 return
+
