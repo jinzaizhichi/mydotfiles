@@ -1258,7 +1258,7 @@ EOF
 let scopycmd=expand('~/develop/sendfiletoremote/sendfile.sh')
 let buildcmd=expand('~/develop/connecttoremote/gotobuild.sh')
 let shouldidocopy = 1
- 
+
 nnoremap <leader>cp :let shouldidocopy = 1<cr>
 nnoremap <leader>sc :let shouldidocopy = 0<cr>
 "nnoremap <leader>bu :call DoBuild()<cr>
